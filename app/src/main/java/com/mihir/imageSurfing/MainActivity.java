@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.mihir.imageSurfing.adapters.ImageAdapter;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<ImageModel> list;
     private GridLayoutManager manager;
     private ImageAdapter adapter;
+    private Button button;
     private int page =1;
     private ProgressDialog dialog;
 
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         list = new ArrayList<>();
+        button = findViewById(R.id.RandomButton);
         adapter = new ImageAdapter(this,list);
         manager = new GridLayoutManager(this,3);
         recyclerView.setLayoutManager(manager);
@@ -58,6 +62,22 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
+        button.setOnClickListener(v->{
+            ApiUtilities.getApiInterface().randomImage().enqueue(new Callback<SearchModel>() {
+                @Override
+                public void onResponse(Call<SearchModel> call, Response<SearchModel> response) {
+                    Log.i("TAG", "onResponse: "+response.raw());
+                    /*Intent intent = new Intent(getApplicationContext(), ImageZoom.class);
+                    intent.putExtra("image", );
+                    startActivity(intent);*/
+                }
+
+                @Override
+                public void onFailure(Call<SearchModel> call, Throwable t) {
+
+                }
+            });
+        });
         getData();
         //to keep track of loading data in background
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -141,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void searchData(String query) {
-        ApiUtilities.getApiInterface().searchImage(query).enqueue(new Callback<SearchModel>() {
+        ApiUtilities.getApiInterface().searchImage(query,30).enqueue(new Callback<SearchModel>() {
             @Override
             public void onResponse( Call<SearchModel> call,  Response<SearchModel> response) {
                 list.clear();

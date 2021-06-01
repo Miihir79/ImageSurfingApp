@@ -25,6 +25,13 @@ public interface ApiInterface {
     @Headers("Authorization: Client-ID "+ API_KEY)
     @GET("/search/photos")
     Call<SearchModel> searchImage(
-            @Query("query") String query
+            @Query("query") String query,
+            @Query("per_page") int perPage
+    );
+
+    @Headers("Authorization: Client-ID "+ API_KEY)
+    @GET("/photos/random")
+    Call<SearchModel> randomImage(
+
     );
 }
