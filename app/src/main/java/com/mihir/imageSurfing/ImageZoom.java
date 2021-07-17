@@ -1,11 +1,18 @@
 package com.mihir.imageSurfing;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Application;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -28,6 +35,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -38,6 +46,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+
+import kotlin.jvm.internal.Intrinsics;
 
 public class ImageZoom extends AppCompatActivity {
 
@@ -61,6 +71,8 @@ public class ImageZoom extends AppCompatActivity {
          downloadBtn.setOnClickListener(v->{
              checkPermission();
          });
+
+         checkPermission();
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
@@ -86,6 +98,42 @@ public class ImageZoom extends AppCompatActivity {
         adView.loadAd(adRequest);
 
     }
+    private void checkNetworkState() {
+        @SuppressLint("ShowToast") Snackbar snackbarNoNetwork = Snackbar.make(
+                findViewById(android.R.id.content),
+                "no internet",
+                Snackbar.LENGTH_INDEFINITE
+        );
+
+
+        Application var10003 = this.getApplication();
+        Intrinsics.checkNotNullExpressionValue(var10003, "application");
+        CheckInternet var6 = new CheckInternet(var10003);
+        if (var6 == null) {
+            Intrinsics.throwUninitializedPropertyAccessException("networkConnectivity");
+        }
+
+        var6.observe(this, new Observer() {
+            // $FF: synthetic method
+            // $FF: bridge method
+            public void onChanged(Object var1) {
+                this.onChanged((Boolean)var1);
+            }
+
+            public final void onChanged(Boolean isConnected) {
+                if (Intrinsics.areEqual(isConnected, true)) {
+                    snackbarNoNetwork.dismiss();
+                    Log.i("Tag", "onCreate: internet is connected");
+                } else if (Intrinsics.areEqual(isConnected, false)) {
+                    snackbarNoNetwork.show();
+                    snackbarNoNetwork.setAnimationMode(Snackbar.ANIMATION_MODE_FADE);
+                    snackbarNoNetwork.setAction("Dismiss",v -> snackbarNoNetwork.dismiss());
+                }
+
+            }
+        });
+
+    }
 
     private void checkPermission(){
         Dexter.withContext(this).withPermissions(
@@ -95,7 +143,7 @@ public class ImageZoom extends AppCompatActivity {
             @Override
             public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
                 if (multiplePermissionsReport.areAllPermissionsGranted()){
-                    downloadImage();
+                    downloadImageUrl();
                 }else{
                     Toast.makeText(ImageZoom.this,"Please allow all the permissions",Toast.LENGTH_LONG).show();
                 }
@@ -108,6 +156,7 @@ public class ImageZoom extends AppCompatActivity {
         }).check();
     }
 
+    //no longer needed
     private void downloadImage() {
 
         ProgressDialog pd = new ProgressDialog(this);
@@ -118,7 +167,7 @@ public class ImageZoom extends AppCompatActivity {
 
         File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-        PRDownloader.download(ImageURL,file.getPath(), URLUtil.guessFileName(ImageURL,null,null))
+        PRDownloader.download(ImageURL,file.getPath(), URLUtil.guessFileName(ImageURL,null,null).replace(".bin","") +".png")
                 .build()
                 .setOnStartOrResumeListener(new OnStartOrResumeListener() {
                     @Override
@@ -140,6 +189,7 @@ public class ImageZoom extends AppCompatActivity {
             @Override
             public void onProgress(Progress progress) {
 
+                //calculating the progress of download
                 long percent = progress.currentBytes*100/progress.totalBytes;
 
                 pd.setMessage("Downloading:"+ percent+"%");
@@ -158,7 +208,26 @@ public class ImageZoom extends AppCompatActivity {
                 Toast.makeText(ImageZoom.this,"Could not download",Toast.LENGTH_LONG).show();
             }
         });
+    }
 
+    private void downloadImageUrl(){
+        DownloadManager downloadManager=null;
+        downloadManager =(DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
+        Uri downloadUri = Uri.parse(ImageURL);
+
+        DownloadManager.Request request = new DownloadManager.Request(downloadUri);
+
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
+                .setAllowedOverRoaming(false)
+                .setMimeType("image/png")
+                .setTitle(URLUtil.guessFileName(ImageURL,null,"image/png"))
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES,File.separator+
+                        URLUtil.guessFileName(ImageURL,null,"image/png"));
+
+        downloadManager.enqueue(request);
+
+        Toast.makeText(this,"Downloaded!",Toast.LENGTH_LONG).show();
     }
 }
