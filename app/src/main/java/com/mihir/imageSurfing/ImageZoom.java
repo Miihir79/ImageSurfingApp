@@ -72,7 +72,7 @@ public class ImageZoom extends AppCompatActivity {
              checkPermission();
          });
 
-         checkPermission();
+         checkNetworkState();
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
