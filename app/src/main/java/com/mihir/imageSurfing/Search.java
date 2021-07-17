@@ -1,6 +1,8 @@
 package com.mihir.imageSurfing;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.Observer;
@@ -10,10 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.mihir.imageSurfing.adapters.ImageAdapter;
@@ -45,10 +49,18 @@ public class Search extends AppCompatActivity {
     private boolean isLoading;
     private boolean isLastPage;
 
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Window window = getWindow();
+        window.setStatusBarColor(getResources().getColor(R.color.statusbar_color));
         setContentView(R.layout.activity_search);
+
+        ActionBar bar = getSupportActionBar();
+        assert bar != null;
+        bar.setBackgroundDrawable(getDrawable(R.drawable.appbarcolor));
 
         Query = getIntent().getStringExtra("query");
         recyclerView = findViewById(R.id.recyclerViewSearch);

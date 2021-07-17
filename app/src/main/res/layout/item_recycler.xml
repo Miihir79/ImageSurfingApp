@@ -14,5 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:id="@+id/imageView"/>
+        android:background="@color/recycler_item_color"
+        android:id="@+id/imageView"
+        android:contentDescription="@string/imageView_textDescription" />
 </com.google.android.material.card.MaterialCardView>

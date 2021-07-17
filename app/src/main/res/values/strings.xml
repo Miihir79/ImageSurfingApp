@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ImageSurfingApp</string>
+    <string name="imageView_textDescription">Images from the Api apear here</string>
+    <string name="DownloadButton_Description">Download button</string>
+    <string name="RandomButton_text">Rand</string>
 </resources>

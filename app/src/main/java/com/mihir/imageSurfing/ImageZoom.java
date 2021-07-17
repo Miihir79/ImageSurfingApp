@@ -1,6 +1,9 @@
 package com.mihir.imageSurfing;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 
 import android.Manifest;
@@ -10,9 +13,11 @@ import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Window;
 import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -42,9 +47,12 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import kotlin.jvm.internal.Intrinsics;
@@ -52,21 +60,29 @@ import kotlin.jvm.internal.Intrinsics;
 public class ImageZoom extends AppCompatActivity {
 
 
-    private ImageButton downloadBtn;
     private String ImageURL;
-    private AdView adView;
 
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Window window = getWindow();
+
+        window.setStatusBarColor(getResources().getColor(R.color.statusbar_color));
+
         setContentView(R.layout.activity_image_zoom);
+
+        ActionBar bar = getSupportActionBar();
+        assert bar != null;
+        bar.setBackgroundDrawable(getDrawable(R.drawable.appbarcolor));
 
         ImageView imageview = findViewById(R.id.myZoomImage);
         ImageURL = getIntent().getStringExtra("image");
         PRDownloader.initialize(getApplicationContext());
         Glide.with(this).load(ImageURL).into(imageview);
 
-         downloadBtn = findViewById(R.id.DownloadButton);
+        ImageButton downloadBtn = findViewById(R.id.DownloadButton);
 
          downloadBtn.setOnClickListener(v->{
              checkPermission();
@@ -76,7 +92,7 @@ public class ImageZoom extends AppCompatActivity {
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {}
+            public void onInitializationComplete(@NotNull InitializationStatus initializationStatus) {}
         });
 
         // Set your test devices. Check your logcat output for the hashed device ID to
@@ -84,12 +100,12 @@ public class ImageZoom extends AppCompatActivity {
         // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
         // to get test ads on this device."
         MobileAds.setRequestConfiguration(
-                new RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("ABCDEF012345"))
+                new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList("ABCDEF012345"))
                         .build());
 
         // Gets the ad view defined in layout/ad_fragment.xml with ad unit ID set in
         // values/strings.xml.
-        adView = findViewById(R.id.adView);
+        AdView adView = findViewById(R.id.adView);
 
         // Create an ad request.
         AdRequest adRequest = new AdRequest.Builder().build();
