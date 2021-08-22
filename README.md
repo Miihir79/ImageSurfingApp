@@ -9,3 +9,4 @@ It is a simple Image surfing app using the Unsplash Api.
 * Zoom In
 * Download Images
 * Continuous network checking
+* Random Images
