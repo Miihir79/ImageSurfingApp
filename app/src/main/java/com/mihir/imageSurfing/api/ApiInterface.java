@@ -30,9 +30,9 @@ public interface ApiInterface {
             @Query("page") int pageSearch
     );
 
-    @Headers("Authorization: Client-ID "+ API_KEY)
+    @Headers("Authorization: Client-ID " + API_KEY)
     @GET("/photos/random")
-    Call<SearchModel> randomImage(
-
+    Call<List<ImageModel>> randomImage(
+        @Query("count") int count
     );
 }

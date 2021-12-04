@@ -18,14 +18,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ImageSurfingApp">
-        <activity android:name=".Search"></activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".Search" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3449990391006526~9174770294" />
 
         <activity android:name=".ImageZoom" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

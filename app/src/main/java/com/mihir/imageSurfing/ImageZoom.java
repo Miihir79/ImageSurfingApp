@@ -3,64 +3,62 @@ package com.mihir.imageSurfing;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.webkit.URLUtil;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.downloader.Error;
-import com.downloader.OnCancelListener;
-import com.downloader.OnDownloadListener;
-import com.downloader.OnPauseListener;
-import com.downloader.OnProgressListener;
-import com.downloader.OnStartOrResumeListener;
 import com.downloader.PRDownloader;
-import com.downloader.Progress;
-import com.downloader.request.DownloadRequestBuilder;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mihir.imageSurfing.api.ApiUtilities;
+import com.mihir.imageSurfing.model.ImageModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import kotlin.jvm.internal.Intrinsics;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ImageZoom extends AppCompatActivity {
 
-
+    private List<ImageModel> list_rand;
+    private Boolean isRandomImage;
+    private int currPos=0;
     private String ImageURL;
+    private String UserName;
+    private ImageView imageview;
+    private TextView text_url;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -77,23 +75,54 @@ public class ImageZoom extends AppCompatActivity {
         assert bar != null;
         bar.setBackgroundDrawable(getDrawable(R.drawable.appbarcolor));
 
-        ImageView imageview = findViewById(R.id.myZoomImage);
+        imageview= findViewById(R.id.myZoomImage);
+        ImageView backButton = findViewById(R.id.btn_nextRandomImage);
+        ImageView prevButton = findViewById(R.id.btn_prevRandomImage);
+        text_url = findViewById(R.id.Url);
         ImageURL = getIntent().getStringExtra("image");
+        UserName = getIntent().getStringExtra("UserName");
+        isRandomImage = getIntent().getBooleanExtra("random",false);
         PRDownloader.initialize(getApplicationContext());
-        Glide.with(this).load(ImageURL).into(imageview);
+        text_url.setText("Image by "+UserName+" on Unsplash");
+
+        if (isRandomImage){
+            backButton.setVisibility(View.VISIBLE);
+            prevButton.setVisibility(View.VISIBLE);
+            getRandom();
+            backButton.setOnClickListener( v->{
+                if(list_rand.size() < currPos){
+                    getRandom();
+                }
+                currPos++;
+                ImageURL = list_rand.get(currPos).getUrls().getRegular();
+                Glide.with(this).load(ImageURL).into(imageview);
+                text_url.setText("Image by "+list_rand.get(currPos).getUser().getUsername()+" on Unsplash");
+            });
+
+            prevButton.setOnClickListener(v->{
+                if(currPos != 0){
+                    currPos--;
+                    ImageURL = list_rand.get(currPos).getUrls().getRegular();
+                    Glide.with(this).load(ImageURL).into(imageview);
+                }
+            });
+        }
+        else{
+            Glide.with(this).load(ImageURL).into(imageview);
+        }
+
+        text_url.setOnClickListener(v->{
+            Uri uri = Uri.parse(ImageURL);
+            startActivity(new Intent(Intent.ACTION_VIEW,uri));
+        });
 
         ImageButton downloadBtn = findViewById(R.id.DownloadButton);
 
-         downloadBtn.setOnClickListener(v->{
-             checkPermission();
-         });
+         downloadBtn.setOnClickListener(v-> checkPermission());
 
          checkNetworkState();
 
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(@NotNull InitializationStatus initializationStatus) {}
-        });
+        MobileAds.initialize(this, initializationStatus -> {});
 
         // Set your test devices. Check your logcat output for the hashed device ID to
         // get test ads on a physical device. e.g.
@@ -113,6 +142,27 @@ public class ImageZoom extends AppCompatActivity {
         // Start loading the ad in the background.
         adView.loadAd(adRequest);
 
+    }
+
+
+    private void getRandom(){
+
+        ApiUtilities.getApiInterface_random().randomImage(10).enqueue(new Callback<List<ImageModel>>() {
+            @Override
+            public void onResponse(@NotNull Call<List<ImageModel>> call, @NotNull Response<List<ImageModel>> response) {
+                Log.i("TAG", "onResponse:"+response.raw());
+                if(response.body() != null){
+                    list_rand = response.body();
+                }
+                ImageURL = list_rand.get(currPos).getUrls().getRegular();
+                Glide.with(getApplicationContext()).load(ImageURL).into(imageview);
+                text_url.setText("Image by "+list_rand.get(currPos).getUser().getUsername()+" on Unsplash");
+            }
+            @Override
+            public void onFailure(@NotNull Call<List<ImageModel>> call, @NotNull Throwable t) {
+
+            }
+        });
     }
     private void checkNetworkState() {
         @SuppressLint("ShowToast") Snackbar snackbarNoNetwork = Snackbar.make(
@@ -172,62 +222,9 @@ public class ImageZoom extends AppCompatActivity {
         }).check();
     }
 
-    //no longer needed
-    private void downloadImage() {
-
-        ProgressDialog pd = new ProgressDialog(this);
-
-        pd.setMessage("Downloading...");
-        pd.setCancelable(false);
-        pd.show();
-
-        File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
-        PRDownloader.download(ImageURL,file.getPath(), URLUtil.guessFileName(ImageURL,null,null).replace(".bin","") +".png")
-                .build()
-                .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-                    @Override
-                    public void onStartOrResume() {
-
-                    }
-                })
-                .setOnPauseListener(new OnPauseListener() {
-                    @Override
-                    public void onPause() {
-
-                    }
-                }).setOnCancelListener(new OnCancelListener() {
-            @Override
-            public void onCancel() {
-
-            }
-        }).setOnProgressListener(new OnProgressListener() {
-            @Override
-            public void onProgress(Progress progress) {
-
-                //calculating the progress of download
-                long percent = progress.currentBytes*100/progress.totalBytes;
-
-                pd.setMessage("Downloading:"+ percent+"%");
-
-            }
-        }).start(new OnDownloadListener() {
-            @Override
-            public void onDownloadComplete() {
-                pd.dismiss();
-                Toast.makeText(ImageZoom.this,"Download Complete",Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onError(Error error) {
-                pd.dismiss();
-                Toast.makeText(ImageZoom.this,"Could not download",Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 
     private void downloadImageUrl(){
-        DownloadManager downloadManager=null;
+        DownloadManager downloadManager;
         downloadManager =(DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
         Uri downloadUri = Uri.parse(ImageURL);

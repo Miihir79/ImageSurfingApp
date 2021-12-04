@@ -3,16 +3,11 @@ package com.mihir.imageSurfing;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+
 import android.os.Build;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +20,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,7 +28,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.mihir.imageSurfing.adapters.ImageAdapter;
 import com.mihir.imageSurfing.api.ApiUtilities;
 import com.mihir.imageSurfing.model.ImageModel;
-import com.mihir.imageSurfing.model.SearchModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -88,20 +81,15 @@ public class MainActivity extends AppCompatActivity {
 
         checkNetworkState();
 
-        button.setOnClickListener(v-> ApiUtilities.getApiInterface().randomImage().enqueue(new Callback<SearchModel>() {
-            @Override
-            public void onResponse(@NotNull Call<SearchModel> call, @NotNull Response<SearchModel> response) {
-                Log.i("TAG", "onResponse: "+response.raw());
-                /*Intent intent = new Intent(getApplicationContext(), ImageZoom.class);
-                intent.putExtra("image", );
-                startActivity(intent);*/
-            }
 
-            @Override
-            public void onFailure(@NotNull Call<SearchModel> call, @NotNull Throwable t) {
+        button.setOnClickListener(v->
+                {
+                    Intent intent = new Intent(this, ImageZoom.class);
+                    intent.putExtra("random",true);
+                    startActivity(intent);
+                });
 
-            }
-        }));
+
         getData();
         //to keep track of loading data in background
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -131,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
 
 
     private void checkNetworkState() {
@@ -180,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 if(response.body()!= null){
                     Log.i("TAG", "onResponse: reached here " + response.raw());
                     list.addAll(response.body());
-                    adapter.notifyDataSetChanged();
+                    adapter.notifyItemInserted(list.size());
 
                 }else{
                     Log.i("TAG", "onResponse:" + response.raw());

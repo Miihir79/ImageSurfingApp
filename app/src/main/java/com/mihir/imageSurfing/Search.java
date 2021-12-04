@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,8 +14,6 @@ import android.app.ProgressDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Window;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -144,8 +141,9 @@ public class Search extends AppCompatActivity {
     private void searchData(String query) {
         ApiUtilities.getApiInterface().searchImage(query,30,page).enqueue(new Callback<SearchModel>() {
             @Override
-            public void onResponse(Call<SearchModel> call, Response<SearchModel> response) {
+            public void onResponse(@NotNull Call<SearchModel> call, @NotNull Response<SearchModel> response) {
                 Log.i("TAG", "onResponse: "+response.raw());
+                assert response.body() != null;
                 list.addAll(response.body().getResults());
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();
@@ -161,7 +159,7 @@ public class Search extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure( Call<SearchModel> call,  Throwable t) {
+            public void onFailure(@NotNull Call<SearchModel> call, @NotNull Throwable t) {
                 dialog.dismiss();
                 Log.i("TAG", "onFailure: "+ t.getMessage());
             }
