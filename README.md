@@ -17,15 +17,6 @@ It is a simple Image surfing app using the Unsplash Api.
 * Continuous network checking
 * Random Images
 
-## What do you need to get started?
-#### Latest version of android studio and basic android and googling skills will get you going.
-
-## How to contribute?
-All contributions are welcomed, Properly describe changes made and attach supporting ScreenShots in the PR. For major changes first open an issue.
-
-## Author
-Initial work: <a href="https://github.com/Miihir79">***Mihir Shah***</a> <br>
-
 ## Images
 
 <table>
@@ -35,3 +26,25 @@ Initial work: <a href="https://github.com/Miihir79">***Mihir Shah***</a> <br>
     <td>Opening an Image<img src="https://user-images.githubusercontent.com/66465511/144702369-d73a048f-4c42-4720-8e9b-3153e401e1ae.jpg" width="350">
     <td>Random Images<img src="https://user-images.githubusercontent.com/66465511/144702367-50828cc4-1383-435d-a185-81bf1bb5fd2c.jpg" width="350">
 </table>
+
+  ## Package Structure
+    
+    com.mihir.imageSurfing    # Root Package
+    .
+    ├── adapter                 # RecyclerView adapter.
+    ├── api                     # For Retrofit to get data.
+    ├── helper                  # helper class for network monitoring.
+    ├── model                   # Model classes for saving data.
+    ├── ui                      # UI/View layer.
+    
+  
+## What do you need to get started?
+#### Latest version of android studio and basic android and googling skills will get you going.
+
+## How to contribute?
+All contributions are welcomed, Properly describe changes made and attach supporting ScreenShots in the PR. For major changes first open an issue.
+
+## Author
+Initial work: <a href="https://github.com/Miihir79">***Mihir Shah***</a> <br>
+
+
