@@ -1,4 +1,4 @@
-package com.mihir.imageSurfing
+package com.mihir.imageSurfing.helper
 
 import android.app.Application
 import android.content.Context

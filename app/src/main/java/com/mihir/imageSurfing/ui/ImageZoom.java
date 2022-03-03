@@ -1,4 +1,4 @@
-package com.mihir.imageSurfing;
+package com.mihir.imageSurfing.ui;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
@@ -36,6 +36,8 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.mihir.imageSurfing.helper.CheckInternet;
+import com.mihir.imageSurfing.R;
 import com.mihir.imageSurfing.api.ApiUtilities;
 import com.mihir.imageSurfing.model.ImageModel;
 

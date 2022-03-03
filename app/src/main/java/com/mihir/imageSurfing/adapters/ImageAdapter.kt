@@ -2,15 +2,13 @@ package com.mihir.imageSurfing.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.mihir.imageSurfing.ImageZoom
+import com.mihir.imageSurfing.ui.ImageZoom
 import com.mihir.imageSurfing.R
 import com.mihir.imageSurfing.model.ImageModel
 import kotlinx.coroutines.CoroutineScope
