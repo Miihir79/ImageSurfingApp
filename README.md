@@ -6,6 +6,8 @@
 <img src="https://img.shields.io/badge/Kotlin-0095D5?&style=for-the-badge&logo=kotlin&logoColor=white"/>
 </p>
 
+![Banner](https://user-images.githubusercontent.com/66465511/158015137-06b18b34-a52e-4e31-957d-f9b98199dac3.png)
+
 ### About 
 It is a simple Image surfing app using the Unsplash Api.
 
