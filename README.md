@@ -39,14 +39,15 @@ It is a simple Image surfing app using the Unsplash Api.
     ├── model                   # Model classes for saving data.
     ├── ui                      # UI/View layer.
     
-  
-## What do you need to get started?
+
+  ## How to contribute?
+### What do you need to get started?
 #### Latest version of android studio and basic android and googling skills will get you going.
 
-## How to contribute?
+
 All contributions are welcomed, Properly describe changes made and attach supporting ScreenShots in the PR. For major changes first open an issue.
 
-## Author
+## Authors
 Initial work: <a href="https://github.com/Miihir79">***Mihir Shah***</a> <br>
 
 
